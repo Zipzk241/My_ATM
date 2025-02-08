@@ -32,6 +32,13 @@ namespace ATMConsole
         public static event ATMEventHandler OnDeposit;
         public static event ATMEventHandler OnTransfer;
 
+        private const string ExitCommand = "exit";
+        public enum TransactionType
+        {
+            Withdrawal,
+            Deposit,
+            Transfer
+        }
         static string connectionString = @"Server=DESKTOP-I41K1CO\SQLEXPRESS;Database=ATM_DB;Trusted_Connection=True;";
 
         static void Main(string[] args)
@@ -175,7 +182,7 @@ namespace ATMConsole
 
                 string input = Console.ReadLine();
 
-                if (input.ToLower() == "exit")
+                if (input.ToLower() == ExitCommand)
                 {
                     Console.WriteLine("Операція скасована.");
                     Console.WriteLine("Натисніть будь-яку клавішу, щоб продовжити...");
@@ -202,7 +209,7 @@ namespace ATMConsole
                 account.Balance -= amount;
                 UpdateBalance(account);
                 OnWithdraw?.Invoke($"Успішно знято {amount} грн");
-                LogTransaction(account.CardNumber, amount, "Withdrawal");
+                LogTransaction(account.CardNumber, amount, TransactionType.Withdrawal);
                 Console.WriteLine("Натисніть будь-яку клавішу, щоб продовжити...");
                 Console.ReadKey();
                 Console.Clear();
@@ -229,7 +236,7 @@ namespace ATMConsole
 
                 string input = Console.ReadLine();
 
-                if (input.ToLower() == "exit")
+                if (input.ToLower() == ExitCommand)
                 {
                     Console.WriteLine("Операція скасована.");
                     Console.WriteLine("Натисніть будь-яку клавішу, щоб продовжити...");
@@ -254,7 +261,7 @@ namespace ATMConsole
             account.Balance += amount;
             UpdateBalance(account);
             OnDeposit?.Invoke($"Успішно зараховано {amount} грн");
-            LogTransaction(account.CardNumber, amount, "Deposit");
+            LogTransaction(account.CardNumber, amount, TransactionType.Deposit);
         }
 
 static bool VerifyPin(string cardNumber, string pin)
@@ -288,8 +295,7 @@ static bool VerifyPin(string cardNumber, string pin)
                 Console.Clear();
                 Console.WriteLine("Введіть номер картки отримувача (4-значне число) або 'exit' для виходу:");
                 receiverCardNumber = Console.ReadLine();
-
-                if (receiverCardNumber.ToLower() == "exit")
+                if (receiverCardNumber.ToLower() == ExitCommand)
                 {
                     Console.WriteLine("Операція скасована.");
                     Console.WriteLine("Натисніть будь-яку клавішу, щоб продовжити...");
@@ -316,7 +322,7 @@ static bool VerifyPin(string cardNumber, string pin)
                 Console.WriteLine("Введіть суму для перерахування (ціле або дробове число) або 'exit' для виходу:");
                 string input = Console.ReadLine();
 
-                if (input.ToLower() == "exit")
+                if (input.ToLower() == ExitCommand)
                 {
                     Console.WriteLine("Операція скасована.");
                     Console.WriteLine("Натисніть будь-яку клавішу, щоб продовжити...");
@@ -392,7 +398,7 @@ static bool VerifyPin(string cardNumber, string pin)
                         UpdateBalance(account);
                         OnTransfer?.Invoke($"Успішно перераховано {amount} грн на картку {receiverCardNumber}." +
                                            (commission > 0 ? $" Комісія: {commission} грн." : ""));
-                        LogTransaction(account.CardNumber, amount, "Transfer", receiverCardNumber);
+                        LogTransaction(account.CardNumber, amount, TransactionType.Transfer, receiverCardNumber);
                     }
                     else
                     {
@@ -445,7 +451,7 @@ static bool VerifyPin(string cardNumber, string pin)
             }
         }
 
-        static void LogTransaction(string cardNumber, decimal amount, string transactionType, string receiverCardNumber = null)
+        static void LogTransaction(string cardNumber, decimal amount, TransactionType  transactionType, string receiverCardNumber = null)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -454,7 +460,7 @@ static bool VerifyPin(string cardNumber, string pin)
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@CardNumber", cardNumber);
                 command.Parameters.AddWithValue("@Amount", amount);
-                command.Parameters.AddWithValue("@TransactionType", transactionType);
+                command.Parameters.AddWithValue("@TransactionType", transactionType.ToString());
                 command.Parameters.AddWithValue("@ReceiverCardNumber", (object)receiverCardNumber ?? DBNull.Value);
 
                 connection.Open();
