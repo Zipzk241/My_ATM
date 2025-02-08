@@ -126,14 +126,12 @@ namespace ATMConsole
             bool exit = false;
             while (!exit)
             {
-                
-                //Console.Clear();
-                Console.WriteLine("\nОберіть операцію:");
-                Console.WriteLine("1. Переглянути баланс");
-                Console.WriteLine("2. Зняти кошти");
-                Console.WriteLine("3. Зарахувати кошти");
-                Console.WriteLine("4. Перерахувати кошти");
-                Console.WriteLine("5. Вийти");
+                Console.WriteLine("\nОберіть операцію:\n" +
+                                  "1. Переглянути баланс\n" +
+                                  "2. Зняти кошти\n" +
+                                  "3. Зарахувати кошти\n" +
+                                  "4. Перерахувати кошти\n" +
+                                  "5. Вийти\n");
 
                 switch (Console.ReadLine())
                 {
