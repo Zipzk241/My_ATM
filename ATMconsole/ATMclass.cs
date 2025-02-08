@@ -38,12 +38,16 @@ namespace ATMclass
     public class Bank
     {
         public string BankName { get; set; }
-        public AutomatedTellerMachine[] ATMs { get; set; }
-
-        public Bank(string bankName, AutomatedTellerMachine[] atms)
+        public List<AutomatedTellerMachine> ATMs { get; }
+        
+        public Bank(string bankName)
         {
             BankName = bankName;
-            ATMs = atms;
+            ATMs = new List<AutomatedTellerMachine>();
+        }
+        public void AddATM(AutomatedTellerMachine atm)
+        {
+            ATMs.Add(atm);
         }
     }
 }
